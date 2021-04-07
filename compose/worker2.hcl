@@ -4,8 +4,6 @@ listener "tcp" {
 	address = "worker2"
 	purpose = "proxy"
 	tls_disable = true
-  // proxy_protocol_behavior = "allow_authorized"
-	// proxy_protocol_authorized_addrs = "127.0.0.1:9200"
 }
 
 worker {
@@ -16,7 +14,7 @@ worker {
   controllers = ["boundary"]
   tags {
     region    = ["us-west-1"],
-    type      = ["dev", "database", "postgres"]
+    type      = ["dev", "database", "redis"]
   }
 }
 

@@ -14,7 +14,7 @@ worker {
   controllers = ["boundary"]
   tags {
     region    = ["us-east-1"],
-    type      = ["prod", "database", "redis"]
+    type      = ["prod", "database", "postgres"]
   }
 }
 

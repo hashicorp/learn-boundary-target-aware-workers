@@ -1,9 +1,6 @@
 version: "3.8"
 
 networks:
-  # default:
-  #   external:
-  #     name: bridge
   default:
   worker1:
   worker2:
@@ -47,7 +44,6 @@ services:
       - BOUNDARY_PG_URL=postgresql://postgres:postgres@db/boundary?sslmode=disable
       - HOSTNAME=boundary
     depends_on:
-      # - db
       - db-init
     networks:
       - default
@@ -59,29 +55,6 @@ services:
       timeout: 10s
       # start_period: 10s
       retries: 5
-
-  # worker:
-  #   image: hashicorp/boundary:0.1.8
-  #   command: ["server", "-config", "/boundary/worker.hcl"]
-  #   volumes:
-  #     - "${PWD}/:/boundary/"
-  #   hostname: worker
-  #   expose:
-  #     - "9200"
-  #     - "9201"
-  #     - "9202"
-  #   environment:
-  #     - HOSTNAME=worker
-  #   depends_on:
-  #     - controller
-  #   # healthcheck:
-  #   #   test: ["CMD", "curl", "-f", "http://boundary:9200"]
-  #   #   interval: 3s
-  #   #   timeout: 10s
-  #   #   # start_period: 10s
-  #   #   retries: 5
-
-# I don't like this pattern :/
 
   worker1:
     image: hashicorp/boundary:0.1.8
@@ -98,12 +71,6 @@ services:
     networks:
       - default
       - worker1
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://boundary:9200"]
-    #   interval: 3s
-    #   timeout: 10s
-    #   # start_period: 10s
-    #   retries: 5
 
   worker2:
     image: hashicorp/boundary:0.1.8
@@ -120,54 +87,31 @@ services:
     networks:
       - default
       - worker2
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://boundary:9200"]
-    #   interval: 3s
-    #   timeout: 10s
-    #   # start_period: 10s
-    #   retries: 5
 
 # Private Database Targets - not exposed to host network, only available via Boundary
-  # cassandra:
-  #   image: bitnami/cassandra:latest
+
+  postgres:
+    image: postgres
+    networks:
+      - worker1
+    environment:
+      - POSTGRES_DB=test1
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 10s
+      retries: 5
 
   mysql:
     image: mysql
     environment:
       - 'MYSQL_ROOT_PASSWORD=my-secret-pw'
     networks:
-      - worker1
+      - worker2
 
   redis:
     image: redis
     networks:
       - worker2
-
-  redis2:
-    image: redis
-    networks:
-      - worker2
-
-  # postgres:
-  #   image: postgres
-  #   # ports:
-  #   #   - 5433:5432
-  #   networks:
-  #     - worker2
-  #   environment:
-  #     - POSTGRES_DB=test1
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=postgres
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
-  #     interval: 3s
-  #     timeout: 10s
-  #     retries: 5
-
-  # mssql:
-  #   image: mcr.microsoft.com/mssql/server:2017-CU8-ubuntu
-  #   environment:
-  #     - 'ACCEPT_EULA=Y'
-  #     - 'SA_PASSWORD=yourStrong(!)Password'
-  #   networks:
-  #     - worker2
