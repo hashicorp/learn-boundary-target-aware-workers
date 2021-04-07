@@ -224,7 +224,7 @@ resource "boundary_target" "mysql" {
   host_set_ids = [
     boundary_host_set.mysql.id
   ]
-  worker_filter            = "\"us-west-1\" in \"/tags/region\""
+  worker_filter            = "\"us-east-1\" in \"/tags/region\""
 }
 
 resource "boundary_host" "redis" {
@@ -256,7 +256,7 @@ resource "boundary_target" "redis" {
     boundary_host_set.redis.id
   ]
   // worker_filter            = "(\"us-east-1\" in \"/tags/region\" and \"/name\" == \"worker1\") or \"redis\" in \"/tags/type\""
-  worker_filter            = "\"/name\" == \"worker2\""
+  // worker_filter            = "\"/name\" == \"worker1\""
 }
 
 resource "boundary_host" "redis2" {
@@ -285,8 +285,8 @@ resource "boundary_target" "redis2" {
   session_max_seconds      = 2
   default_port             = 6379
   host_set_ids = [
-    boundary_host_set.redis.id
+    boundary_host_set.redis2.id
   ]
   // worker_filter            = "\"us-west-1\" in \"/tags/region\" and \"/name\" == \"worker2\""
-  worker_filter            = "\"/name\" == \"worker2\""
+  // worker_filter            = "\"/name\" == \"worker2\""
 }

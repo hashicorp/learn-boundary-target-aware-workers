@@ -1,7 +1,7 @@
 disable_mlock = true
 
 listener "tcp" {
-	address = "worker1:9202"
+	address = "worker1"
 	purpose = "proxy"
 	tls_disable = true
 }
