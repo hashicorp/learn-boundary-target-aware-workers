@@ -3,6 +3,8 @@ disable_mlock = true
 controller {
   name = "docker-controller"
   description = "A controller for a docker demo!"
+  address = "boundary"
+  // public_cluster_addr = "boundary:9201"
   database {
       url = "env://BOUNDARY_PG_URL"
   }
@@ -12,8 +14,8 @@ listener "tcp" {
   address = "boundary"
   purpose = "api"
   tls_disable = true
-  proxy_protocol_behavior = "allow_authorized"
-	proxy_protocol_authorized_addrs = "127.0.0.1"
+  // proxy_protocol_behavior = "allow_authorized"
+	// proxy_protocol_authorized_addrs = "127.0.0.1"
   cors_enabled = true
 	cors_allowed_origins = ["*"]
 }
@@ -22,8 +24,8 @@ listener "tcp" {
   address = "boundary"
   purpose = "cluster"
   tls_disable = true
-  proxy_protocol_behavior = "allow_authorized"
-	proxy_protocol_authorized_addrs = "127.0.0.1"
+  // proxy_protocol_behavior = "allow_authorized"
+	// proxy_protocol_authorized_addrs = "127.0.0.1"
 }
 
 kms "aead" {

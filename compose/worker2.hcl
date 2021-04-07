@@ -1,20 +1,21 @@
 disable_mlock = true
 
-worker {
-  name = "docker-worker-2"
-  description = "A worker for a docker demo"
-  // address = "worker"
-  address = "worker2"
-  controllers = ["boundary"]
-}
-
 listener "tcp" {
-  // address = "worker"
-	address = "worker2:9202"
+	address = "worker2:9203"
 	purpose = "proxy"
 	tls_disable = true
-  proxy_protocol_behavior = "allow_authorized"
-	proxy_protocol_authorized_addrs = "127.0.0.1"
+}
+
+worker {
+  name = "worker2"
+  description = "A worker for a docker demo"
+  address     = "worker2"
+  public_addr = "localhost"
+  controllers = ["boundary"]
+  tags {
+    region    = ["us-west-1"],
+    type      = ["dev", "database", "postgres"]
+  }
 }
 
 kms "aead" {

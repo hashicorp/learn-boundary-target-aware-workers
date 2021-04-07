@@ -1,5 +1,13 @@
 version: "3.8"
 
+networks:
+  # default:
+  #   external:
+  #     name: bridge
+  default:
+  worker1:
+  worker2:
+
 services:
   db:
     image: postgres
@@ -12,7 +20,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 3s
-      timeout: 5s
+      timeout: 10s
       retries: 5
 
   db-init:
@@ -35,12 +43,17 @@ services:
     ports:
       - "9200:9200"
       - "9201:9201"
-      - "9202:9202"
+      # - "9202:9202"
     environment:
       - BOUNDARY_PG_URL=postgresql://postgres:postgres@db/boundary?sslmode=disable
       - HOSTNAME=boundary
     depends_on:
+      # - db
       - db-init
+    networks:
+      - default
+      - worker1
+      - worker2
     healthcheck:
       test: ["CMD", "curl", "-f", "http://boundary:9200"]
       interval: 3s
@@ -77,14 +90,15 @@ services:
     volumes:
       - "${PWD}/:/boundary/"
     hostname: worker1
-    expose:
-      - "9200"
-      - "9201"
-      - "9202"
+    ports:
+      - "9202:9202"
     environment:
       - HOSTNAME=worker1
     depends_on:
       - controller
+    networks:
+      - default
+      - worker1
     # healthcheck:
     #   test: ["CMD", "curl", "-f", "http://boundary:9200"]
     #   interval: 3s
@@ -98,14 +112,15 @@ services:
     volumes:
       - "${PWD}/:/boundary/"
     hostname: worker2
-    expose:
-      - "9200"
-      - "9201"
-      - "9202"
+    ports:
+      - "9203:9202"
     environment:
       - HOSTNAME=worker2
     depends_on:
       - controller
+    networks:
+      - default
+      - worker2
     # healthcheck:
     #   test: ["CMD", "curl", "-f", "http://boundary:9200"]
     #   interval: 3s
@@ -114,19 +129,46 @@ services:
     #   retries: 5
 
 # Private Database Targets - not exposed to host network, only available via Boundary
-  cassandra:
-    image: bitnami/cassandra:latest
+  # cassandra:
+  #   image: bitnami/cassandra:latest
 
   mysql:
     image: mysql
     environment:
       - 'MYSQL_ROOT_PASSWORD=my-secret-pw'
+    networks:
+      - worker1
 
   redis:
     image: redis
+    networks:
+      - worker1
 
-  mssql:
-    image: mcr.microsoft.com/mssql/server:2017-CU8-ubuntu
+  redis2:
+    image: redis
+    networks:
+      - worker2
+
+  postgres:
+    image: postgres
+    # ports:
+    #   - 5433:5432
+    networks:
+      - worker2
     environment:
-      - 'ACCEPT_EULA=Y'
-      - 'SA_PASSWORD=yourStrong(!)Password'
+      - POSTGRES_DB=test1
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
+  #     interval: 3s
+  #     timeout: 10s
+  #     retries: 5
+
+  # mssql:
+  #   image: mcr.microsoft.com/mssql/server:2017-CU8-ubuntu
+  #   environment:
+  #     - 'ACCEPT_EULA=Y'
+  #     - 'SA_PASSWORD=yourStrong(!)Password'
+  #   networks:
+  #     - worker2

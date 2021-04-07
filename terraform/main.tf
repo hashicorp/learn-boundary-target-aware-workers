@@ -152,10 +152,10 @@ resource "boundary_target" "ssh" {
   ]
 }
 
-resource "boundary_target" "postgres" {
+resource "boundary_target" "db" {
   type                     = "tcp"
-  name                     = "postgres"
-  description              = "Postgres server"
+  name                     = "boundary-db"
+  description              = "Boundary Postgres server"
   scope_id                 = boundary_scope.project.id
   session_connection_limit = -1
   session_max_seconds      = 2
@@ -165,34 +165,35 @@ resource "boundary_target" "postgres" {
   ]
 }
 
-resource "boundary_host" "cassandra" {
+resource "boundary_host" "postgres" {
   type        = "static"
-  name        = "cassandra"
-  description = "Private cassandra container"
+  name        = "postgres"
+  description = "Private postgres container"
   # DNS set via docker-compose
-  address         = "cassandra"
+  address         = "postgres"
   host_catalog_id = boundary_host_catalog.databases.id
 }
 
-resource "boundary_host_set" "cassandra" {
+resource "boundary_host_set" "postgres" {
   type            = "static"
-  name            = "cassandra"
-  description     = "Host set for cassandra containers"
+  name            = "postgres"
+  description     = "Host set for postgres containers"
   host_catalog_id = boundary_host_catalog.databases.id
-  host_ids        = [boundary_host.cassandra.id]
+  host_ids        = [boundary_host.postgres.id]
 }
 
-resource "boundary_target" "cassandra" {
+resource "boundary_target" "postgres" {
   type                     = "tcp"
-  name                     = "cassandra"
-  description              = "Cassandra server"
+  name                     = "postgres"
+  description              = "postgres server"
   scope_id                 = boundary_scope.project.id
   session_connection_limit = -1
   session_max_seconds      = 2
-  default_port             = 7000
+  default_port             = 5432
   host_set_ids = [
-    boundary_host_set.cassandra.id
+    boundary_host_set.postgres.id
   ]
+  worker_filter            = "\"/name\" == \"worker2\" or (\"dev\" in \"/tags/type\" and \"database\" in \"/tags/type\")"
 }
 
 resource "boundary_host" "mysql" {
@@ -223,6 +224,7 @@ resource "boundary_target" "mysql" {
   host_set_ids = [
     boundary_host_set.mysql.id
   ]
+  worker_filter            = "\"us-west-1\" in \"/tags/region\""
 }
 
 resource "boundary_host" "redis" {
@@ -253,34 +255,38 @@ resource "boundary_target" "redis" {
   host_set_ids = [
     boundary_host_set.redis.id
   ]
+  // worker_filter            = "(\"us-east-1\" in \"/tags/region\" and \"/name\" == \"worker1\") or \"redis\" in \"/tags/type\""
+  worker_filter            = "\"/name\" == \"worker2\""
 }
 
-resource "boundary_host" "mssql" {
+resource "boundary_host" "redis2" {
   type        = "static"
-  name        = "mssql"
-  description = "Private mssql container"
+  name        = "redis2"
+  description = "Private redis2 container"
   # DNS set via docker-compose
-  address         = "mssql"
+  address         = "redis2"
   host_catalog_id = boundary_host_catalog.databases.id
 }
 
-resource "boundary_host_set" "mssql" {
+resource "boundary_host_set" "redis2" {
   type            = "static"
-  name            = "mssql"
-  description     = "Host set for mssql containers"
+  name            = "redis2"
+  description     = "Host set for redis2 containers"
   host_catalog_id = boundary_host_catalog.databases.id
-  host_ids        = [boundary_host.mssql.id]
+  host_ids        = [boundary_host.redis2.id]
 }
 
-resource "boundary_target" "mssql" {
+resource "boundary_target" "redis2" {
   type                     = "tcp"
-  name                     = "mssql"
-  description              = "Microsoft SQL server"
+  name                     = "redis2"
+  description              = "Redis server2"
   scope_id                 = boundary_scope.project.id
   session_connection_limit = -1
   session_max_seconds      = 2
-  default_port             = 1433
+  default_port             = 6379
   host_set_ids = [
-    boundary_host_set.local.id
+    boundary_host_set.redis.id
   ]
+  // worker_filter            = "\"us-west-1\" in \"/tags/region\" and \"/name\" == \"worker2\""
+  worker_filter            = "\"/name\" == \"worker2\""
 }
