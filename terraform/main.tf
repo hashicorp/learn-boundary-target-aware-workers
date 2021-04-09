@@ -194,6 +194,7 @@ resource "boundary_target" "postgres" {
     boundary_host_set.postgres.id
   ]
   worker_filter            = "\"/name\" == \"worker1\" or (\"prod\" in \"/tags/type\" and \"database\" in \"/tags/type\")"
+  // worker_filter            = "/name" == "worker1" or ("prod" in "/tags/type" and "database" in "/tags/type") # Unformatted filter
 }
 
 resource "boundary_host" "mysql" {
@@ -219,12 +220,13 @@ resource "boundary_target" "mysql" {
   description              = "MySQL server"
   scope_id                 = boundary_scope.project.id
   session_connection_limit = -1
-  session_max_seconds      = 20
+  session_max_seconds      = 100
   default_port             = 3306
   host_set_ids = [
     boundary_host_set.mysql.id
   ]
   worker_filter            = "\"us-west-1\" in \"/tags/region\""
+  // worker_filter            = "us-west-1" in "/tags/region" # Unformatted filter
 }
 
 resource "boundary_host" "redis" {
@@ -255,5 +257,6 @@ resource "boundary_target" "redis" {
   host_set_ids = [
     boundary_host_set.redis.id
   ]
-  worker_filter            = "(\"us-west-1\" in \"/tags/region\" and \"/name\" == \"worker2\") or \"redis\" in \"/tags/type\""
+  worker_filter            = "(\"us-east-1\" in \"/tags/region\" and \"/name\" == \"worker1\") or \"redis\" in \"/tags/type\""
+  // worker_filter            = ("us-west-1" in "/tags/region" and "/name" == "worker2") or "redis" in "/tags/type" # Unformatted filter
 }

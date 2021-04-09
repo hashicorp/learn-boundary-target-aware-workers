@@ -10,7 +10,7 @@ worker {
   name = "worker1"
   description = "A worker for a docker demo"
   address     = "worker1"
-  public_addr = "localhost"
+  public_addr = "localhost:9202"
   controllers = ["boundary"]
   tags {
     region    = ["us-east-1"],
