@@ -1,3 +1,5 @@
+// compose/worker1.hcl
+
 disable_mlock = true
 
 listener "tcp" {
@@ -14,7 +16,8 @@ worker {
   controllers = ["boundary"]
   tags {
     region    = ["us-east-1"],
-    type      = ["prod", "database", "postgres"]
+    type      = ["prod"]
+    // type      = ["prod", "database", "postgres", "mysql"]
   }
 }
 
