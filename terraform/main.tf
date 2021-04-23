@@ -23,8 +23,6 @@ variable "users" {
   type = set(string)
   default = [
     "user1",
-    "user2",
-    "user3"
   ]
 }
 
@@ -193,40 +191,8 @@ resource "boundary_target" "postgres" {
   host_set_ids = [
     boundary_host_set.postgres.id
   ]
-  worker_filter            = "\"/name\" == \"worker1\" or (\"prod\" in \"/tags/type\" and \"database\" in \"/tags/type\")"
-  // worker_filter            = "/name" == "worker1" or ("prod" in "/tags/type" and "database" in "/tags/type") # Unformatted filter
-}
-
-resource "boundary_host" "mysql" {
-  type        = "static"
-  name        = "mysql"
-  description = "Private mysql container"
-  # DNS set via docker-compose
-  address         = "mysql"
-  host_catalog_id = boundary_host_catalog.databases.id
-}
-
-resource "boundary_host_set" "mysql" {
-  type            = "static"
-  name            = "mysql"
-  description     = "Host set for mysql containers"
-  host_catalog_id = boundary_host_catalog.databases.id
-  host_ids        = [boundary_host.mysql.id]
-}
-
-resource "boundary_target" "mysql" {
-  type                     = "tcp"
-  name                     = "mysql"
-  description              = "MySQL server"
-  scope_id                 = boundary_scope.project.id
-  session_connection_limit = -1
-  session_max_seconds      = 100
-  default_port             = 3306
-  host_set_ids = [
-    boundary_host_set.mysql.id
-  ]
-  worker_filter            = "\"us-west-1\" in \"/tags/region\""
-  // worker_filter            = "us-west-1" in "/tags/region" # Unformatted filter
+  // worker_filter             = "\"/name\" == \"worker1\""
+  // worker_filter_unformatted = "/name" == "worker1" # Unformatted filter, don't uncomment
 }
 
 resource "boundary_host" "redis" {
@@ -257,6 +223,39 @@ resource "boundary_target" "redis" {
   host_set_ids = [
     boundary_host_set.redis.id
   ]
-  worker_filter            = "(\"us-east-1\" in \"/tags/region\" and \"/name\" == \"worker1\") or \"redis\" in \"/tags/type\""
-  // worker_filter            = ("us-west-1" in "/tags/region" and "/name" == "worker2") or "redis" in "/tags/type" # Unformatted filter
+  // worker_filter             = "\"us-west-1\" in \"/tags/region\" or \"redis\" in \"/tags/type\""
+  // worker_filter_unformatted = "us-west-1" in "/tags/region" or "redis" in "/tags/type" # Unformatted filter, don't uncomment
+}
+
+resource "boundary_host" "mysql" {
+  type        = "static"
+  name        = "mysql"
+  description = "Private mysql container"
+  # DNS set via docker-compose
+  address         = "mysql"
+  host_catalog_id = boundary_host_catalog.databases.id
+}
+
+resource "boundary_host_set" "mysql" {
+  type            = "static"
+  name            = "mysql"
+  description     = "Host set for mysql containers"
+  host_catalog_id = boundary_host_catalog.databases.id
+  host_ids        = [boundary_host.mysql.id]
+}
+
+resource "boundary_target" "mysql" {
+  type                     = "tcp"
+  name                     = "mysql"
+  description              = "MySQL server"
+  scope_id                 = boundary_scope.project.id
+  session_connection_limit = -1
+  session_max_seconds      = 100
+  default_port             = 3306
+  host_set_ids = [
+    boundary_host_set.mysql.id
+  ]
+  worker_filter                = "\"/name\" == \"bad filter\""
+  // worker_filter             = "\"/name\" == \"worker1\" or (\"prod\" in \"/tags/type\" and \"database\" in \"/tags/type\")"
+  // worker_filter_unformatted = "/name" == "worker1" or ("prod" in "/tags/type" and "database" in "/tags/type")" # Unformatted filter, don't uncomment
 }
