@@ -104,14 +104,14 @@ services:
       timeout: 10s
       retries: 5
 
+  redis:
+    image: redis
+    networks:
+      - worker2
+
   mysql:
     image: mysql
     environment:
       - 'MYSQL_ROOT_PASSWORD=my-secret-pw'
     networks:
-      - worker2
-
-  redis:
-    image: redis
-    networks:
-      - worker2
+      - worker1
