@@ -49,12 +49,13 @@ services:
       - default
       - worker1
       - worker2
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:9200"]
-      interval: 3s
-      timeout: 10s
-      start_period: 10s
-      retries: 5
+    # healthcheck:
+    #   # test: ["CMD", "wget", "-q", "http://boundary:9200"]
+    #   test: export http_proxy=$$(hostname -i | awk '{print $$2}'):9200 ; wget -q --spider --proxy=on 'http://boundary:9200'
+    #   interval: 3s
+    #   timeout: 10s
+    #   start_period: 10s
+    #   retries: 5
 
   worker1:
     image: hashicorp/boundary:0.2.0
