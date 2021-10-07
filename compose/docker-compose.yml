@@ -21,7 +21,7 @@ services:
       retries: 5
 
   db-init:
-    image: hashicorp/boundary:0.2.0
+    image: hashicorp/boundary:0.6.2
     command: ["database", "init", "-config", "/boundary/controller.hcl"]
     volumes:
       - "${PWD}/:/boundary/"
@@ -32,7 +32,7 @@ services:
         condition: service_healthy
 
   controller:
-    image: hashicorp/boundary:0.2.0
+    image: hashicorp/boundary:0.6.2
     # command: ["server", "-config", "/boundary/controller.hcl"]
     entrypoint: sh -c "sleep 3 && exec boundary server -config /boundary/controller.hcl"
     volumes:
@@ -51,7 +51,7 @@ services:
       - worker2
 
   worker1:
-    image: hashicorp/boundary:0.2.0
+    image: hashicorp/boundary:0.6.2
     command: ["server", "-config", "/boundary/worker1.hcl"]
     volumes:
       - "${PWD}/:/boundary/"
@@ -67,7 +67,7 @@ services:
       - worker1
 
   worker2:
-    image: hashicorp/boundary:0.2.0
+    image: hashicorp/boundary:0.6.2
     command: ["server", "-config", "/boundary/worker2.hcl"]
     volumes:
       - "${PWD}/:/boundary/"
