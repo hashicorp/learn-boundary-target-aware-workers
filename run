@@ -1,44 +1,40 @@
 #!/bin/bash
 
 function cleanup() {
-  pushd compose
-  docker compose -p boundary rm -fs 
-  popd
-  pushd terraform/
+  pushd compose || exit 1
+  docker compose -p boundary rm -fsv
+  popd || exit 1
+  pushd terraform || exit 1
   rm terraform.tfstate*
-  popd
+  popd || exit 1
   exit 0
 }
-trap cleanup SIGKILL SIGINT
+trap cleanup SIGINT
 
 function init_compose() {
-  pushd compose/
+  pushd compose || exit 1
   docker compose --project-name boundary up -d
-  popd
+  popd || exit 1
 }
 
 function init_terraform() {
-  pushd terraform
+  pushd terraform || exit 1
   terraform init
   terraform apply -auto-approve
-  popd
+  popd || exit 1
 }
 
 # Test with login to Boundary after provisioning
 function login() {
-  boundary authenticate password -login-name jeff -password foofoofoo -auth-method-id $(primary_org_ampw)
+  boundary authenticate password -login-name user1 -password password -auth-method-id "$(primary_org_ampw)"
 }
 
 function primary_org_id() {
-  strip $(boundary scopes list -format json | jq  -c '.[] | select(.name | contains("primary")) | .["id"]')
+  boundary scopes list -format json | jq -r -c '.items[] | select(.name | contains("primary")) | .["id"]'
 }
 
 function primary_org_ampw() {
-  strip $(boundary auth-methods list -scope-id $(primary_org_id) -format json | jq -c '.[]["id"]') 
-}
-
-function strip() {
-  echo "$1" | tr -d '"'
+  boundary auth-methods list -scope-id "$(primary_org_id)" -format json | jq -r -c '.items[]["id"]'
 }
 
 for arg in "$@"

@@ -126,7 +126,7 @@ resource "boundary_host" "localhost" {
 }
 
 # Target hosts available on localhost: ssh and postgres
-# Postgres is exposed to localhost for debugging of the 
+# Postgres is exposed to localhost for debugging of the
 # Boundary DB from the CLI. Assumes SSHD is running on
 # localhost.
 resource "boundary_host_set" "local" {
@@ -255,7 +255,7 @@ resource "boundary_target" "mysql" {
   host_set_ids = [
     boundary_host_set.mysql.id
   ]
-  worker_filter                = "\"/name\" == \"bad filter\""
+  worker_filter = "\"/name\" == \"bad filter\""
   // worker_filter             = "\"/name\" == \"worker1\" or (\"prod\" in \"/tags/type\" and \"database\" in \"/tags/type\")"
   // worker_filter_unformatted = "/name" == "worker1" or ("prod" in "/tags/type" and "database" in "/tags/type")" # Unformatted filter, don't uncomment
 }
