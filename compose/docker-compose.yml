@@ -18,7 +18,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 3s
       timeout: 10s
-      retries: 5
+      retries: 10
 
   db-init:
     image: hashicorp/boundary:0.7.5
@@ -33,7 +33,8 @@ services:
 
   controller:
     image: hashicorp/boundary:0.7.5
-    # command: ["server", "-config", "/boundary/controller.hcl"]
+    # I had to `docker restart boundary_controller_1` a couple times when
+    # running on an Ubuntu host.
     entrypoint: sh -c "sleep 3 && exec boundary server -config /boundary/controller.hcl -log-level debug"
     volumes:
       - "${PWD}/:/boundary/"
@@ -104,7 +105,8 @@ services:
       - worker2
 
   mysql:
-    image: mysql
+    # image: mysql does not have an M1 compatible version
+    image: mysql:oracle
     environment:
       - 'MYSQL_ROOT_PASSWORD=my-secret-pw'
     networks:

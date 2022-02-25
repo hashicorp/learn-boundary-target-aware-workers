@@ -2,7 +2,7 @@
 
 function cleanup() {
   pushd compose || exit 1
-  docker compose -p boundary rm -fsv
+  docker-compose -p boundary rm -fsv
   popd || exit 1
   pushd terraform || exit 1
   rm terraform.tfstate*
@@ -13,7 +13,7 @@ trap cleanup SIGINT
 
 function init_compose() {
   pushd compose || exit 1
-  docker compose --project-name boundary up -d
+  docker-compose --project-name boundary up -d
   popd || exit 1
 }
 
