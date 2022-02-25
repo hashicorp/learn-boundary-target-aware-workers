@@ -17,7 +17,7 @@ worker {
   tags {
     region    = ["us-east-1"],
     type      = ["prod"]
-    // type      = ["prod", "databases", "postgres", "mysql"]
+    // type      = ["prod", "database", "postgres", "mysql"]
   }
 }
 

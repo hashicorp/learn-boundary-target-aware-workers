@@ -17,7 +17,7 @@ worker {
   tags {
     region    = ["us-west-1"],
     type      = ["dev"]
-    // type      = ["dev", "databases", "redis"]
+    // type      = ["dev", "database", "redis"]
   }
 }
 
