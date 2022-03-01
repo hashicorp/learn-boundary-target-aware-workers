@@ -105,8 +105,7 @@ services:
       - worker2
 
   mysql:
-    # image: mysql does not have an M1 compatible version
-    image: mysql:oracle
+    image: mariadb
     environment:
       - 'MYSQL_ROOT_PASSWORD=my-secret-pw'
     networks:
