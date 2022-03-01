@@ -18,10 +18,10 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 3s
       timeout: 10s
-      retries: 5
+      retries: 10
 
   db-init:
-    image: hashicorp/boundary:0.6.2
+    image: hashicorp/boundary:0.7.5
     command: ["database", "init", "-config", "/boundary/controller.hcl"]
     volumes:
       - "${PWD}/:/boundary/"
@@ -32,9 +32,10 @@ services:
         condition: service_healthy
 
   controller:
-    image: hashicorp/boundary:0.6.2
-    # command: ["server", "-config", "/boundary/controller.hcl"]
-    entrypoint: sh -c "sleep 3 && exec boundary server -config /boundary/controller.hcl"
+    image: hashicorp/boundary:0.7.5
+    # I had to `docker restart boundary_controller_1` a couple times when
+    # running on an Ubuntu host.
+    entrypoint: sh -c "sleep 3 && exec boundary server -config /boundary/controller.hcl -log-level debug"
     volumes:
       - "${PWD}/:/boundary/"
     hostname: boundary
@@ -51,8 +52,8 @@ services:
       - worker2
 
   worker1:
-    image: hashicorp/boundary:0.6.2
-    command: ["server", "-config", "/boundary/worker1.hcl"]
+    image: hashicorp/boundary:0.7.5
+    command: ["server", "-config", "/boundary/worker1.hcl", "-log-level", "debug"]
     volumes:
       - "${PWD}/:/boundary/"
     hostname: worker1
@@ -67,8 +68,8 @@ services:
       - worker1
 
   worker2:
-    image: hashicorp/boundary:0.6.2
-    command: ["server", "-config", "/boundary/worker2.hcl"]
+    image: hashicorp/boundary:0.7.5
+    command: ["server", "-config", "/boundary/worker2.hcl", "-log-level", "debug"]
     volumes:
       - "${PWD}/:/boundary/"
     hostname: worker2
@@ -86,8 +87,6 @@ services:
 
   postgres:
     image: postgres
-    networks:
-      - worker1
     environment:
       - POSTGRES_DB=test1
       - POSTGRES_USER=postgres
@@ -97,6 +96,8 @@ services:
       interval: 3s
       timeout: 10s
       retries: 5
+    networks:
+      - worker1
 
   redis:
     image: redis
@@ -104,7 +105,7 @@ services:
       - worker2
 
   mysql:
-    image: mysql
+    image: mariadb
     environment:
       - 'MYSQL_ROOT_PASSWORD=my-secret-pw'
     networks:

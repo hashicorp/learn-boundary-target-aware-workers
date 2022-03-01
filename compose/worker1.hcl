@@ -13,7 +13,7 @@ worker {
   description = "A worker for a docker demo"
   address     = "worker1"
   public_addr = "localhost:9202"
-  controllers = ["boundary"]
+  controllers = ["boundary:9201"]
   tags {
     region    = ["us-east-1"],
     type      = ["prod"]

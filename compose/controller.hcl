@@ -10,15 +10,15 @@ controller {
 }
 
 listener "tcp" {
-  address = "boundary"
+  address = "0.0.0.0:9200"
   purpose = "api"
   tls_disable = true
   cors_enabled = true
-	cors_allowed_origins = ["*"]
+  cors_allowed_origins = ["*"]
 }
 
 listener "tcp" {
-  address = "boundary"
+  address = "boundary:9201"
   purpose = "cluster"
   tls_disable = true
 }
