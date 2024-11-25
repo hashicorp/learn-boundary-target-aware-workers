@@ -1,5 +1,7 @@
 # Docker Deployment
 
+New repo here: https://github.com/hashicorp-education/learn-boundary-target-aware-workers
+
 This directory contains an example deployment of Boundary using docker-compose and Terraform. The lab environment is meant to accompany the Hashicorp Learn [Boundary target-aware workers tutorial](https://learn.hashicorp.com/tutorials/boundary/target-aware-workers).
 
 In this example, Boundary is deployed using the [hashicorp/boundary](https://hub.docker.com/r/hashicorp/boundary) Dockerhub image. The Boundary service ports are forwarded to the host machine to mimic being in a "public" network. Boundary is provisioned via Terraform to include targets for popular databases:
